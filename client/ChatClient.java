@@ -48,7 +48,19 @@ public class ChatClient extends AbstractClient
 
   
   //Instance methods ************************************************
-    
+  @Override
+  protected void connectionClosed() {
+	  clientUI.display("Connection to server was terminated. Terminating Client.");
+	  quit();
+  }
+  @Override
+  protected void connectionException(Exception exception) {
+	  System.out.println("Could not connect to server. Terminating Client.");
+	  quit();
+  }
+  
+  
+  
   /**
    * This method handles all data that comes in from the server.
    *
@@ -68,6 +80,7 @@ public class ChatClient extends AbstractClient
   {
     try
     {
+    	
       sendToServer(message);
     }
     catch(IOException e)
@@ -90,5 +103,12 @@ public class ChatClient extends AbstractClient
     catch(IOException e) {}
     System.exit(0);
   }
+  
+  
+  
+	  
+  }
+  
+  
 }
 //End of ChatClient class
