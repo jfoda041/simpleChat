@@ -74,14 +74,20 @@ public class EchoServer extends AbstractServer
   
   @Override 
   protected void clientConnected(ConnectionToClient client) {
-	  sendToAllClients("New connection form client "+client.toString()+".");
+	  sendToAllClients(client.toString() + " joined the server");
 	  
 	
   }
   
   @Override
-  protected void clientException( ConnectionToClient client, Throwable exception) {
-	  sendToAllClients("A client has disconnected.");
+  synchronized protected void clientDisconnected( ConnectionToClient client) {
+	  sendToAllClients(client.toString() +" has disconnected.");
+  }
+  
+  @Override
+  synchronized protected void clientException(
+		    ConnectionToClient client, Throwable exception) {
+	  sendToAllClients(client.toString() +" had an error" );
   }
   
   //Class methods ***************************************************
