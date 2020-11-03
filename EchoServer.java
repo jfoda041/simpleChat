@@ -24,6 +24,8 @@ public class EchoServer extends AbstractServer
    */
   final public static int DEFAULT_PORT = 5555;
   
+  private ServerConsole console;
+  
   //Constructors ****************************************************
   
   /**
@@ -34,6 +36,9 @@ public class EchoServer extends AbstractServer
   public EchoServer(int port) 
   {
     super(port);
+    
+    console = new ServerConsole(this);
+    
   }
 
   
@@ -50,6 +55,11 @@ public class EchoServer extends AbstractServer
   {
     System.out.println("Message received: " + msg + " from " + client);
     this.sendToAllClients(msg);
+  }
+  
+  public void handleMessageFromServer(String msg) {
+	  
+	 this.sendToAllClients(msg);
   }
     
   /**
@@ -74,9 +84,7 @@ public class EchoServer extends AbstractServer
   
   @Override 
   protected void clientConnected(ConnectionToClient client) {
-	  sendToAllClients(client.toString() + " joined the server");
-	  
-	
+	  sendToAllClients(client.toString() + " joined the server");	
   }
   
   @Override

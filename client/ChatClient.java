@@ -96,8 +96,11 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-    	
-      sendToServer(message);
+    	if (message.startsWith("#")) {
+    		handleFunctions(message);
+    	} else {
+    	      sendToServer(message);
+    	}
     }
     catch(IOException e)
     {
@@ -120,7 +123,75 @@ public class ChatClient extends AbstractClient
     System.exit(0);
   }
   
+  private void handleFunctions(String message) {
+	
+	  if (message.equals("#quit")) {
+		  quit();
+	  } else if (message.equals("#logoff")) {
+		  
+		  try{
+			  closeConnection();
+		  } catch (IOException e) {}  
+		  
+	  } else if (message.startsWith("#sethost")) {
+		  
+		  if(!this.isConnected()) {
+			  
+			  if (message.length() >= 10) {
+					this.setHost(message.substring(9));  
+			  } else {
+				  clientUI.display(" not a valid host ");
+			  }
+		  } else {
+			  clientUI.display(" Please disconnect before trying to change host");
+		  }
+		  
+	  } else if (message.equals("#setport")) {
+		  
+		  if(!this.isConnected()) {
+			  
+			  
+			  if (message.length() >= 10) {
+				  try {
+						this.setPort(Integer.parseInt(message.substring(9)));  
+					  } catch (NumberFormatException e){
+						  clientUI.display(" not a valid port");
+					  }
+			  } else {
+				  clientUI.display(" not a valid port");
+			  }
+			  
+			  
+		  } else {
+			  clientUI.display(" Please disconnect before trying to change port");
+		  }
+		  
+	  } else if (message.equals("#login")) {
+		  
+		  if(!this.isConnected()) {
+			  try {
+			  this.openConnection();
+			  } catch (IOException e) {
+				  clientUI.display("Could not connect");
+			  }
+			  
+		  } else {
+			  clientUI.display(" Already connected");
+		  }
+		  
+	  } else if (message.equals("#gethost")) {
+		  
+		  clientUI.display(this.getHost());
+		  
+	  } else if (message.equals("#getport")) {
+		  
+		  clientUI.display(Integer.toString(this.getPort()));
+		  
+      } else {
+    	  clientUI.display("unknown command.");
+      }
   
+  }
   
 	  
   
