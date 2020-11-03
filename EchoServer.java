@@ -37,7 +37,7 @@ public class EchoServer extends AbstractServer
   {
     super(port);
     
-    console = new ServerConsole(this);
+    //console = new ServerConsole(this);
     
   }
 
@@ -53,8 +53,20 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+	  
+	  if (msg.toString().startsWith("#login ")){
+		  if (client.getInfo("login_id") == null) {
+			  client.setInfo("login_id", msg.toString().substring(7));
+		  } else {
+			  try{
+				  client.close();
+			  } catch (IOException e) {}
+		  }
+	  } else {
+		  System.out.println("Message received: " + msg + " from " + client);
+		    this.sendToAllClients(client.getInfo("login_id") + " : "+ msg.toString());
+	  }
+    
   }
   
   public void handleMessageFromServer(String msg) {
@@ -131,5 +143,8 @@ public class EchoServer extends AbstractServer
       System.out.println("ERROR - Could not listen for clients!");
     }
   }
+
+
+
 }
 //End of EchoServer class

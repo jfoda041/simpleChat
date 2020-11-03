@@ -26,6 +26,8 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   ChatIF clientUI; 
+  
+  String login_id;
 
   
   //Constructors ****************************************************
@@ -38,16 +40,26 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
   
-  public ChatClient(String host, int port, ChatIF clientUI) 
+  public ChatClient(String login_id, String host, int port) {
+		// Initialize variables
+	  super(host,port);
+	  this.login_id = login_id;
+		
+	}
+  
+  public ChatClient(String login_id, String host, int port, ChatIF clientUI) 
     throws IOException 
   {
-    super(host, port); //Call the superclass constructor
+	  super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
+    this.login_id = login_id;
     openConnection();
+    handleMessageFromClientUI("#login " + login_id);
   }
 
   
   //Instance methods ************************************************
+  
   /**
 	 * Hook method called after the connection has been closed. The default
 	 * implementation does nothing. The method may be overriden by subclasses to
@@ -171,6 +183,7 @@ public class ChatClient extends AbstractClient
 		  if(!this.isConnected()) {
 			  try {
 			  this.openConnection();
+			  handleMessageFromClientUI("#login " + login_id);
 			  } catch (IOException e) {
 				  clientUI.display("Could not connect");
 			  }
