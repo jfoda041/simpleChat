@@ -47,18 +47,24 @@ public class ChatClient extends AbstractClient
 		
 	}
   
-  public ChatClient(String login_id, String host, int port, ChatIF clientUI) 
-    throws IOException 
+  public ChatClient(String login_id, String host, int port, ChatIF clientUI)  
   {
 	  super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
     this.login_id = login_id;
-    openConnection();
-    handleMessageFromClientUI("#login " + login_id);
+    
   }
 
   
   //Instance methods ************************************************
+   
+  public void startConnection() throws IOException{
+	  
+	  openConnection();
+      handleMessageFromClientUI("#login " + login_id);
+	  
+  }
+  
   
   /**
 	 * Hook method called after the connection has been closed. The default
@@ -68,8 +74,8 @@ public class ChatClient extends AbstractClient
 	 */
   	@Override
 	protected void connectionClosed() {
-  		clientUI.display("Connection to server was terminated. Terminating Client.");
-  	  quit();
+  		clientUI.display("Connection to server was terminated.");
+  	  
 	}
 
 	/**
@@ -82,8 +88,10 @@ public class ChatClient extends AbstractClient
 	 */
   	@Override
 	protected void connectionException(Exception exception) {
-  		System.out.println("Could not connect to server. Terminating Client.");
-  	  quit();
+  		System.out.println("Could not connect to server.");
+  		try{
+  			closeConnection();
+  		} catch (IOException e) {}
 	}
  
   
@@ -106,20 +114,25 @@ public class ChatClient extends AbstractClient
    */
   public void handleMessageFromClientUI(String message)
   {
-    try
-    {
-    	if (message.startsWith("#")) {
-    		handleFunctions(message);
-    	} else {
-    	      sendToServer(message);
-    	}
-    }
-    catch(IOException e)
-    {
-      clientUI.display
-        ("Could not send message to server.  Terminating client.");
-      quit();
-    }
+	  if (message.startsWith("#") && !message.startsWith("#login ")) {
+  		clientUI.display(message);
+  		handleFunctions(message);
+	  } else {
+		  
+		  try
+		    {
+			  sendToServer(message);
+		    }
+		    catch(IOException e)
+		    {
+		      clientUI.display
+		        ("Could not send message to server.  Terminating client.");
+		      quit();
+		    }
+		  
+	  }
+	  
+    
   }
   
   /**
@@ -150,15 +163,17 @@ public class ChatClient extends AbstractClient
 		  if(!this.isConnected()) {
 			  
 			  if (message.length() >= 10) {
-					this.setHost(message.substring(9));  
+					this.setHost(message.substring(9)); 
+					clientUI.display("host set to : " + (message.substring(9)));
 			  } else {
 				  clientUI.display(" not a valid host ");
+				  
 			  }
 		  } else {
 			  clientUI.display(" Please disconnect before trying to change host");
 		  }
 		  
-	  } else if (message.equals("#setport")) {
+	  } else if (message.startsWith("#setport")) {
 		  
 		  if(!this.isConnected()) {
 			  
@@ -166,6 +181,7 @@ public class ChatClient extends AbstractClient
 			  if (message.length() >= 10) {
 				  try {
 						this.setPort(Integer.parseInt(message.substring(9)));  
+						clientUI.display("port set to : " + Integer.parseInt(message.substring(9)));
 					  } catch (NumberFormatException e){
 						  clientUI.display(" not a valid port");
 					  }
@@ -177,6 +193,7 @@ public class ChatClient extends AbstractClient
 		  } else {
 			  clientUI.display(" Please disconnect before trying to change port");
 		  }
+		
 		  
 	  } else if (message.equals("#login")) {
 		  
@@ -201,7 +218,7 @@ public class ChatClient extends AbstractClient
 		  clientUI.display(Integer.toString(this.getPort()));
 		  
       } else {
-    	  clientUI.display("unknown command.");
+    	  clientUI.display("Unknown command");
       }
   
   }

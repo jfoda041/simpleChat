@@ -9,7 +9,8 @@ public class ServerConsole implements ChatIF {
 	
 	public ServerConsole(EchoServer server) {
 		this.server = server;
-		accept();
+		fromConsole = new Scanner(System.in);
+		
 	}
 	
 	public void display(String message) 
@@ -19,7 +20,7 @@ public class ServerConsole implements ChatIF {
 
 	public void accept() 
 	  {
-	    try
+		try
 	    {
 
 	      String message;
@@ -36,6 +37,37 @@ public class ServerConsole implements ChatIF {
 	        ("Unexpected error while reading from console!");
 	    }
 	  }
+	
+	public static void main (String[] ARGS) {
+		int port = 0; //Port to listen on
+
+	    try
+	    {
+	      port = Integer.parseInt(ARGS[0]); //Get port from command line
+	    }
+	    catch(Throwable t)
+	    {
+	      port = 5555; //Set port to 5555
+	    }
+		
+	    EchoServer sv = new EchoServer(port);
+	    ServerConsole serverChat = new ServerConsole(sv);
+	    sv.setConsole (serverChat);
+	    
+	    
+	    try 
+	    {
+	      sv.listen(); //Start listening for connections
+	    } 
+	    catch (Exception ex) 
+	    {
+	      System.out.println("ERROR - Could not listen for clients!");
+	    }
+	    
+	    serverChat.accept();
+		
+		
+	}
 		
 	
 }
