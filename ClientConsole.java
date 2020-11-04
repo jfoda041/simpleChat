@@ -115,7 +115,9 @@ public class ClientConsole implements ChatIF
   /**
    * This method is responsible for the creation of the Client UI.
    *
-   * @param args[0] The host to connect to.
+   * @param args[0] The login_id of the user .
+   * @param args[1] the host to connect to.
+   * @param args[2] the port to connect to
    */
   public static void main(String[] args) 
   {
